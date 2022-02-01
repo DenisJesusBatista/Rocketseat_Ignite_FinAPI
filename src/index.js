@@ -20,7 +20,7 @@ function verifyIfExistsAccountCPF(request, response, next) {
         return response.status(400).json({ error: "Customer not found" });
     }
 
-    request.customer = customer
+    request.customer = customer;
 
     return next();
 }
@@ -35,7 +35,7 @@ app.post("/account", (request, response) => {
         cpf,
         name,
         id: uuidv4(),
-        statement: []
+        statement: [],
 
     });
 
@@ -52,9 +52,26 @@ app.get("/statement", verifyIfExistsAccountCPF, (request, response) => {
 
     return response.json(customer.statement);
 
-})
+});
+
+app.post("/deposit", verifyIfExistsAccountCPF, (request, response) => {
+    const { description, amount } = request.body;
+
+    /*Verifica se a conta é válida ou não.* */
+    const { customer } = request;
+
+    const statementOperation = {
+        description,
+        amount,
+        created_at: new Date(),
+        type: "credit",
+
+    };
+
+    customer.statement.push(statementOperation);
+
+    return response.status(201).send();
+});
 
 app.listen(3333);
 
-
-//Como criar o middleware e como inserir informações dentro do request
