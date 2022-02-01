@@ -7,6 +7,24 @@ app.use(express.json());
 
 const customers = [];
 
+// Middleware
+/*Middlewares é aquilo que está no meio
+Uma função que fica entre a requisição (request) e entre nosso response*/
+
+function verifyIfExistsAccountCPF(request, response, next) {
+    const { cpf } = request.headers;
+
+    const customer = customers.find((customer) => customer.cpf === cpf);
+
+    if (!customer) {
+        return response.status(400).json({ error: "Customer not found" });
+    }
+
+    request.customer = customer
+
+    return next();
+}
+
 
 /*Método POST: Criação de algum dados*/
 app.post("/account", (request, response) => {
@@ -25,17 +43,18 @@ app.post("/account", (request, response) => {
 
 });
 
-app.get("/statement", (request, response) => {
-    const { cpf } = request.headers;
+//app.use(verifyIfExistsAccountCPF);
 
-    const customer = customers.find((customer) => customer.cpf === cpf);
+app.get("/statement", verifyIfExistsAccountCPF, (request, response) => {
 
-    if (!customer) {
-        return response.status(400).json({ error: "Customer not found" });
-    }
+    const { customer } = request;
+
 
     return response.json(customer.statement);
 
 })
 
 app.listen(3333);
+
+
+//Como criar o middleware e como inserir informações dentro do request
