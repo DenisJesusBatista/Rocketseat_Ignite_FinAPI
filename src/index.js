@@ -132,7 +132,14 @@ app.put("/account", verifyIfExistsAccountCPF, (request, response) => {
     customer.name = name;
 
     return response.status(201).send();
-})
+});
+
+/**Obter os dados da conta */
+app.get("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const { customer } = request;
+
+    return response.json(customer);
+});
 
 app.listen(3333);
 
